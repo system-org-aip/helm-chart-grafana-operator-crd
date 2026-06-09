@@ -1,0 +1,67 @@
+{{- range $groupName, $groupConfig := .Values.alerting.ruleGroups }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaAlertRuleGroup
+metadata:
+  name: {{ printf "%s-%s" (include "grafana-resources.fullname" $) $groupName }}
+  labels:
+    {{- include "grafana-resources.labels" $ | nindent 4 }}
+spec:
+  folderRef: {{ $groupConfig.folderRef | quote }}
+  interval: {{ $groupConfig.interval | default "1m" }}
+  instanceSelector:
+    matchLabels:
+      dashboards: {{ $.Values.instance.dashboardLabel | default (include "grafana-resources.fullname" $) | quote }}
+  rules:
+    {{- range $rule := $groupConfig.rules }}
+    - title: {{ $rule.name | quote }}
+      # Если uid не задан, берем name и обрезаем до 40 символов (лимит Grafana для UID)
+      uid: {{ $rule.uid | default ($rule.name | trunc 40) | quote }}
+      execErrState: {{ $rule.execErrState | default "Error" | quote }}
+      for: {{ $rule.for | default "5m0s" | quote }}
+      noDataState: {{ $rule.noDataState | default "OK" | quote }}
+      condition: B
+      {{- if $rule.annotations }}
+      annotations:
+        {{- tpl (toYaml $rule.annotations) $ | nindent 8 }}
+      {{- end }}
+      data:
+        # Блок А: Запрос к Прометеусу (PromQL)
+        - datasourceUid: {{ $groupConfig.datasourceUid | quote }}
+          refId: A
+          relativeTimeRange: { from: 600, to: 0 }
+          model:
+            datasource: 
+              type: prometheus
+              uid: {{ $groupConfig.datasourceUid | quote }}
+            editorMode: code
+            expr: {{ $rule.expr | quote }}
+            instant: true
+            intervalMs: 1000
+            legendFormat: __auto
+            maxDataPoints: 43200
+            range: false
+            refId: A
+        
+        # Блок B: Математическое выражение (Threshold)
+        - datasourceUid: __expr__
+          refId: B
+          relativeTimeRange: { from: 600, to: 0 }
+          model:
+            datasource: { type: __expr__, uid: __expr__ }
+            expression: A
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: B
+            type: threshold
+            conditions:
+              - evaluator:
+                  type: {{ $rule.evaluatorType | default "gt" | quote }}
+                  params:
+                    - {{ $rule.evaluatorParam | default 0 }}
+                operator: { type: and }
+                query: { params: [A] }
+                reducer: { params: [], type: last }
+                type: query
+    {{- end }}
+{{- end }}

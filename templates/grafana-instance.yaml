@@ -1,0 +1,57 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: Grafana
+metadata:
+  name: {{ include "grafana-resources.fullname" . }}
+  labels:
+    {{- include "grafana-resources.labels" . | nindent 4 }}
+    dashboards: {{ .Values.instance.dashboardLabel | default (include "grafana-resources.fullname" .) }}
+spec:
+  disableDefaultAdminSecret: {{ .Values.instance.disableDefaultAdminSecret | default true }}
+  
+  {{- if .Values.instance.ingress.enabled }}
+  ingress:
+    spec:
+      ingressClassName: {{ .Values.instance.ingress.className | quote }}
+      rules:
+        - host: {{ .Values.instance.ingress.host | quote }}
+          http:
+            paths:
+              - path: {{ .Values.instance.ingress.path | default "/" }}
+                pathType: {{ .Values.instance.ingress.pathType | default "Prefix" }}
+                backend:
+                  service:
+                    # Имя сервиса обычно генерируется оператором как <имя-инстанса>-service
+                    name: {{ printf "%s-service" (include "grafana-resources.fullname" .) }}
+                    port:
+                      number: {{ .Values.instance.ingress.port | default 3000 }}
+  {{- end }}
+
+  config:
+    server:
+      root_url: {{ .Values.instance.config.rootUrl | quote }}
+    database:
+      type: {{ .Values.instance.config.database.type | default "postgres" | quote }}
+      host: {{ .Values.instance.config.database.host | quote }}
+      name: {{ .Values.instance.config.database.name | default "grafana" | quote }}
+      user: {{ .Values.instance.config.database.user | quote }}
+      password: {{ .Values.instance.config.database.password | quote }}
+    auth.google:
+      enabled: {{ .Values.instance.config.authGoogle.enabled | quote }}
+      allow_sign_up: {{ .Values.instance.config.authGoogle.allowSignUp | quote }}
+      auto_login: {{ .Values.instance.config.authGoogle.autoLogin | quote }}
+      client_id: {{ .Values.instance.config.authGoogle.clientId | quote }}
+      client_secret: {{ .Values.instance.config.authGoogle.clientSecret | quote }}
+      scopes: {{ .Values.instance.config.authGoogle.scopes | quote }}
+      allowed_domains: {{ .Values.instance.config.authGoogle.allowedDomains | quote }}
+
+  deployment:
+    spec:
+      replicas: {{ .Values.instance.replicas | default 1 }}
+      template:
+        spec:
+          containers:
+            - name: grafana
+              {{- if .Values.instance.env }}
+              env:
+                {{- toYaml .Values.instance.env | nindent 16 }}
+              {{- end }}

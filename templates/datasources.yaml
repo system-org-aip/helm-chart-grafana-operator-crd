@@ -1,0 +1,43 @@
+{{- range $name, $config := .Values.datasources }}
+---
+apiVersion: grafana.intereally.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  # Используем имя из ключа словаря
+  name: {{ printf "%s-%s" (include "grafana-resources.fullname" $) $name }}
+  labels:
+    {{- include "grafana-resources.labels" $ | nindent 4 }}
+spec:
+  # Если uid не задан явно, генерируем его из имени
+  uid: {{ $config.uid | default (printf "%s-%s" (include "grafana-resources.fullname" $) $name) | quote }}
+  instanceSelector:
+    matchLabels:
+      dashboards: {{ $.Values.instance.dashboardLabel | default (include "grafana-resources.fullname" $) | quote }}
+  datasource:
+    name: {{ $config.displayName | default (printf "%s-%s" (include "grafana-resources.fullname" $) $name) | quote }}
+    type: {{ $config.type | quote }}
+    url: {{ $config.url | quote }}
+    access: {{ $config.access | default "proxy" | quote }}
+    {{- if $config.isDefault }}
+    isDefault: true
+    {{- end }}
+    {{- if $config.user }}
+    user: {{ $config.user | quote }}
+    {{- end }}
+    {{- if $config.jsonData }}
+    jsonData:
+      {{- toYaml $config.jsonData | nindent 6 }}
+    {{- end }}
+    {{- if $config.secureJsonData }}
+    secureJsonData:
+      {{- toYaml $config.secureJsonData | nindent 6 }}
+    {{- end }}
+  {{- if $config.plugins }}
+  plugins:
+    {{- toYaml $config.plugins | nindent 4 }}
+  {{- end }}
+  {{- if $config.valuesFrom }}
+  valuesFrom:
+    {{- toYaml $config.valuesFrom | nindent 4 }}
+  {{- end }}
+{{- end }}

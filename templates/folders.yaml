@@ -1,0 +1,16 @@
+{{- range $key, $folder := .Values.folders }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  # Имя ресурса в Kubernetes (с префиксом чарта для избежания конфликтов)
+  name: {{ printf "%s-%s" (include "grafana-resources.fullname" $) $key }}
+  labels:
+    {{- include "grafana-resources.labels" $ | nindent 4 }}
+spec:
+  instanceSelector:
+    matchLabels:
+      # Подставляем лейбл инстанса: либо кастомный из values, либо дефолтный fullname
+      dashboards: {{ $.Values.instance.dashboardLabel | default (include "grafana-resources.fullname" $) | quote }}
+  title: {{ $folder.title | default $key | quote }}
+{{- end }}

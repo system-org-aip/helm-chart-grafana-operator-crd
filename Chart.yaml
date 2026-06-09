@@ -1,0 +1,10 @@
+apiVersion: v2
+name: grafana-operator-crd
+description: Helm chart for Grafana Operator CRDs managment.
+type: application
+version: 0.1.0
+appVersion: 0.1.0
+keywords:
+  - grafana
+  - operator
+  - crd

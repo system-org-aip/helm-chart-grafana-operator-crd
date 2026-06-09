@@ -1,0 +1,15 @@
+{{- range $name, $policyConfig := .Values.alerting.notificationPolicies }}
+---
+apiVersion: grafana.intereally.org/v1beta1
+kind: GrafanaNotificationPolicy
+metadata:
+  name: {{ printf "%s-%s" (include "grafana-resources.fullname" $) $name }}
+  labels:
+    {{- include "grafana-resources.labels" $ | nindent 4 }}
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: {{ $.Values.instance.dashboardLabel | default (include "grafana-resources.fullname" $) | quote }}
+  route:
+    {{- tpl (toYaml $policyConfig.route) $ | nindent 4 }}
+{{- end }}
