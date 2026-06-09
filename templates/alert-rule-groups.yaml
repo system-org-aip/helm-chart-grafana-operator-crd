@@ -23,7 +23,7 @@ spec:
       condition: B
       {{- if $rule.annotations }}
       annotations:
-        {{- tpl (toYaml $rule.annotations) $ | nindent 8 }}
+        {{- toYaml $rule.annotations | nindent 8 }}
       {{- end }}
       data:
         # Блок А: Запрос к Прометеусу (PromQL)

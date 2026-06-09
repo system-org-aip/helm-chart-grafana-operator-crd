@@ -12,5 +12,5 @@ spec:
       dashboards: {{ $.Values.instance.dashboardLabel | default (include "grafana-operator-crd.fullname" $) | quote }}
   name: {{ $cpConfig.name | default $name }}
   receivers:
-    {{- tpl (toYaml $cpConfig.receivers) $ | nindent 4 }}
+    {{- toYaml $cpConfig.receivers | nindent 4 }}
 {{- end }}
