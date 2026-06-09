@@ -1,10 +1,10 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: Grafana
 metadata:
-  name: {{ include "grafana-resources.fullname" . }}
+  name: {{ include "grafana-operator-crd.fullname" . }}
   labels:
-    {{- include "grafana-resources.labels" . | nindent 4 }}
-    dashboards: {{ .Values.instance.dashboardLabel | default (include "grafana-resources.fullname" .) }}
+    {{- include "grafana-operator-crd.labels" . | nindent 4 }}
+    dashboards: {{ .Values.instance.dashboardLabel | default (include "grafana-operator-crd.fullname" .) }}
 spec:
   disableDefaultAdminSecret: {{ .Values.instance.disableDefaultAdminSecret | default true }}
   
@@ -21,7 +21,7 @@ spec:
                 backend:
                   service:
                     # Имя сервиса обычно генерируется оператором как <имя-инстанса>-service
-                    name: {{ printf "%s-service" (include "grafana-resources.fullname" .) }}
+                    name: {{ printf "%s-service" (include "grafana-operator-crd.fullname" .) }}
                     port:
                       number: {{ .Values.instance.ingress.port | default 3000 }}
   {{- end }}

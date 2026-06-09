@@ -3,9 +3,9 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  name: {{ printf "%s-%s" (include "grafana-resources.fullname" $) $name }}
+  name: {{ printf "%s-%s" (include "grafana-operator-crd.fullname" $) $name }}
   labels:
-    {{- include "grafana-resources.labels" $ | nindent 4 }}
+    {{- include "grafana-operator-crd.labels" $ | nindent 4 }}
 spec:
   # Если папка не указана, дашборд упадет в корень
   {{- if $config.folderRef }}
@@ -16,7 +16,7 @@ spec:
   
   instanceSelector:
     matchLabels:
-      dashboards: {{ $.Values.instance.dashboardLabel | default (include "grafana-resources.fullname" $) | quote }}
+      dashboards: {{ $.Values.instance.dashboardLabel | default (include "grafana-operator-crd.fullname" $) | quote }}
   
   # Прокидываем переменные окружения (например, для датасорсов внутри JSON)
   {{- if $config.envs }}

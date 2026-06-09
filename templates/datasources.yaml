@@ -4,17 +4,17 @@ apiVersion: grafana.intereally.org/v1beta1
 kind: GrafanaDatasource
 metadata:
   # Используем имя из ключа словаря
-  name: {{ printf "%s-%s" (include "grafana-resources.fullname" $) $name }}
+  name: {{ printf "%s-%s" (include "grafana-operator-crd.fullname" $) $name }}
   labels:
-    {{- include "grafana-resources.labels" $ | nindent 4 }}
+    {{- include "grafana-operator-crd.labels" $ | nindent 4 }}
 spec:
   # Если uid не задан явно, генерируем его из имени
-  uid: {{ $config.uid | default (printf "%s-%s" (include "grafana-resources.fullname" $) $name) | quote }}
+  uid: {{ $config.uid | default (printf "%s-%s" (include "grafana-operator-crd.fullname" $) $name) | quote }}
   instanceSelector:
     matchLabels:
-      dashboards: {{ $.Values.instance.dashboardLabel | default (include "grafana-resources.fullname" $) | quote }}
+      dashboards: {{ $.Values.instance.dashboardLabel | default (include "grafana-operator-crd.fullname" $) | quote }}
   datasource:
-    name: {{ $config.displayName | default (printf "%s-%s" (include "grafana-resources.fullname" $) $name) | quote }}
+    name: {{ $config.displayName | default (printf "%s-%s" (include "grafana-operator-crd.fullname" $) $name) | quote }}
     type: {{ $config.type | quote }}
     url: {{ $config.url | quote }}
     access: {{ $config.access | default "proxy" | quote }}
