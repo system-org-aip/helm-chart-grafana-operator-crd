@@ -1,6 +1,6 @@
 {{- range $name, $config := .Values.datasources }}
 ---
-apiVersion: grafana.intereally.org/v1beta1
+apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
 metadata:
   # Используем имя из ключа словаря

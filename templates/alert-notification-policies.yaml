@@ -1,6 +1,6 @@
 {{- range $name, $policyConfig := .Values.alerting.notificationPolicies }}
 ---
-apiVersion: grafana.intereally.org/v1beta1
+apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaNotificationPolicy
 metadata:
   name: {{ printf "%s-%s" (include "grafana-operator-crd.fullname" $) $name }}
