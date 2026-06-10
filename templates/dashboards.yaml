@@ -3,7 +3,7 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  name: {{ printf "%s-%s" (include "grafana-operator-crd.fullname" $) $name }}
+  name: {{ $name }}
   labels:
     {{- include "grafana-operator-crd.labels" $ | nindent 4 }}
 spec:

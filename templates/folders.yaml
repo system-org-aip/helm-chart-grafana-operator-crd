@@ -4,7 +4,7 @@ apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaFolder
 metadata:
   # Имя ресурса в Kubernetes (с префиксом чарта для избежания конфликтов)
-  name: {{ printf "%s-%s" (include "grafana-operator-crd.fullname" $) $key }}
+  name: {{ $key }}
   labels:
     {{- include "grafana-operator-crd.labels" $ | nindent 4 }}
 spec:
