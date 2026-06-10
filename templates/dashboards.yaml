@@ -28,7 +28,7 @@ spec:
   {{- if $config.configMapRef }}
   # Читаем JSON из существующего ConfigMap
   jsonFrom:
-    name: {{ $config.configMapRef.name }}
+    name: {{ $config.configMapRef.name | default (printf "dashboard-%s" $name) }}
     key: {{ $config.configMapRef.key | default "dashboard.json" }}
   {{- else if $config.json }}
   json: |
