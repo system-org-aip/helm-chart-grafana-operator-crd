@@ -24,12 +24,22 @@ spec:
     {{- toYaml $config.envs | nindent 4 }}
   {{- end }}
 
-  # Рендерим JSON: либо переданный строкой, либо прочитанный из файла
-  {{- if $config.json }}
+  # Поддержка JSON из разных источников
+  {{- if $config.configMapRef }}
+  # Читаем JSON из существующего ConfigMap
+  jsonFrom:
+    name: {{ $config.configMapRef.name }}
+    key: {{ $config.configMapRef.key | default "dashboard.json" }}
+  {{- else if $config.json }}
   json: |
     {{- $config.json | nindent 4 }}
   {{- else if $config.file }}
   json: |
     {{- $.Files.Get $config.file | nindent 4 }}
+  {{- else if $config.fileContent }}
+  json: |
+    {{- $config.fileContent | nindent 4 }}
+  {{- else }}
+    {{- fail (printf "No data source provided for dashboard %s" $name) }}
   {{- end }}
 {{- end }}
