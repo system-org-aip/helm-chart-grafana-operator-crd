@@ -24,8 +24,13 @@ spec:
     {{- toYaml $config.envs | nindent 4 }}
   {{- end }}
 
-  # Поддержка JSON из разных источников
-  {{- if $config.configMapRef }}
+  # Поддержка JSON из разных источников (теперь включая Grafana.com)
+  {{- if $config.grafanaCom }}
+  # Импорт публичного дашборда напрямую с grafana.com
+  grafanaCom:
+    id: {{ $config.grafanaCom.id | required (printf "grafanaCom.id is required for dashboard %s" $name) }}
+    revision: {{ $config.grafanaCom.revision | default 1 }}
+  {{- else if $config.configMapRef }}
   # Читаем JSON из существующего ConfigMap
   configMapRef:
     name: {{ $config.configMapRef.name | default (printf "dashboard-%s" $name) }}
@@ -40,6 +45,6 @@ spec:
   json: |
     {{- $config.fileContent | nindent 4 }}
   {{- else }}
-    {{- fail (printf "No data source provided for dashboard %s" $name) }}
+    {{- fail (printf "No data source or grafanaCom config provided for dashboard %s" $name) }}
   {{- end }}
 {{- end }}

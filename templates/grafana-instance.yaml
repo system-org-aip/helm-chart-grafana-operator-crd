@@ -6,6 +6,7 @@ metadata:
     {{- include "grafana-operator-crd.labels" . | nindent 4 }}
     dashboards: {{ .Values.instance.dashboardLabel | default (include "grafana-operator-crd.fullname" .) }}
 spec:
+  version: 
   disableDefaultAdminSecret: {{ .Values.instance.disableDefaultAdminSecret | default true }}
   
   {{- if .Values.instance.ingress.enabled }}
