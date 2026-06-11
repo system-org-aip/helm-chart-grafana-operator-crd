@@ -1,3 +1,4 @@
+YAML
 {{- range $key, $folder := .Values.folders }}
 ---
 apiVersion: grafana.integreatly.org/v1beta1
@@ -14,9 +15,8 @@ spec:
   
   title: {{ $folder.title | default $key | quote }}
 
-  # Добавляем поддержку вложенных папок
+  # Исправлено: parentFolderRef ожидает строку, а не объект!
   {{- if $folder.parentFolderRef }}
-  parentFolderRef:
-    name: {{ $folder.parentFolderRef | quote }}
+  parentFolderRef: {{ $folder.parentFolderRef | quote }}
   {{- end }}
 {{- end }}
