@@ -1,4 +1,3 @@
-YAML
 {{- range $key, $folder := .Values.folders }}
 ---
 apiVersion: grafana.integreatly.org/v1beta1
