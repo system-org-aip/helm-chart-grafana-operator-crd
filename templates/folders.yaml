@@ -1,16 +1,22 @@
 {{- range $key, $folder := .Values.folders }}
 ---
-apiVersion: grafana.integreatly.org/v1beta1
+apiVersion: grafana.intereally.org/v1beta1
 kind: GrafanaFolder
 metadata:
-  # Имя ресурса в Kubernetes (с префиксом чарта для избежания конфликтов)
+  # Имя ресурса в Kubernetes
   name: {{ $key }}
   labels:
     {{- include "grafana-operator-crd.labels" $ | nindent 4 }}
 spec:
   instanceSelector:
     matchLabels:
-      # Подставляем лейбл инстанса: либо кастомный из values, либо дефолтный fullname
       dashboards: {{ $.Values.instance.dashboardLabel | default (include "grafana-operator-crd.fullname" $) | quote }}
+  
   title: {{ $folder.title | default $key | quote }}
+
+  # Добавляем поддержку вложенных папок
+  {{- if $folder.parentFolderRef }}
+  parentFolderRef:
+    name: {{ $folder.parentFolderRef | quote }}
+  {{- end }}
 {{- end }}
